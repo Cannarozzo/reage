@@ -26,14 +26,17 @@ Usuario json
     avatar      Int
     cor         Int
     UniqueUsuario email
+    deriving Show
 Publicacao json
     usuarioId       UsuarioId
     conteudo        Text
     dataCompleta    Text 
     categoria       CategoriaId
+    deriving Show
 Categoria json
-    categoria   Text -- CategoriaTipo, implementar o fromJson
+    nome   Text -- CategoriaTipo, implementar o fromJson
     descricao   Text
+    deriving Show
 |]
 
 mkYesod "Reage" [parseRoutes|
@@ -159,18 +162,24 @@ postUsuarioPublicarR = do
     agora <- liftIO $ getCurrentTime
     p <- requireJsonBody :: Handler Publicacao
     runDB $ insert ( Publicacao (publicacaoUsuarioId p) (publicacaoConteudo p) (pack "00-00-00") (publicacaoCategoria p) ) -- Implementar UTCTime
-    sendResponse (object [pack "resp" .= pack "Postagem Criada"])
+    sendResponse (object [pack "resp" .= pack "Postagem Criada"]) --felipe?
     
     
 -- == publicacoes   PublicacoesR   
 optionsPublicacoesR :: Handler ()
-optionsPublicacoesR = undefined
-
+optionsPublicacoesR = do
+    addHeader "Access-Control-Allow-Origin" "*"
+    addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
+    addHeader "Access-Control-Allow-Methods" "GET"
 getPublicacoesR :: Handler ()
 getPublicacoesR = do
     addHeader "Access-Control-Allow-Origin" "*"
-    publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta]
-    sendResponse (object["usuario" .= fmap toJSON publicacao])
+    xs <- runDB $ (rawSql (pack $ "SELECT ??, ?? FROM usuario  \ 
+        \ INNER JOIN publicacao \
+        \ ON  usuario.id=publicacao.usuario_id ") []) :: Handler [(Entity Usuario,Entity Publicacao)]
+    liftIO $ print $ show xs    
+    --publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta]
+    sendResponse (object["usuario" .= pack "a"])
 
     
 -- == buscar
