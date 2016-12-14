@@ -14,7 +14,7 @@ data Reage = Reage{connPool :: ConnectionPool}
 
 instance Yesod Reage
 
-share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+share [mkPersist sqlSettings,  mkDeleteCascade sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Usuario json
     apelido     Text
     senha       Text Maybe
@@ -146,7 +146,7 @@ deleteUsuarioRemoverR :: UsuarioId -> Handler ()
 deleteUsuarioRemoverR cid = do
     addHeader "Access-Control-Allow-Origin" "*"
     runDB $ get404 cid
-    runDB $ delete cid
+    runDB $ deleteCascade cid
     sendResponse (object [pack "resp".= pack "Deleted"])
 
 -- == usuario/postar UsuarioPostarR
@@ -177,10 +177,9 @@ getPublicacoesR = do
     xs <- runDB $ (rawSql (pack $ "SELECT ??, ?? FROM usuario  \ 
         \ INNER JOIN publicacao \
         \ ON  usuario.id=publicacao.usuario_id ") []) :: Handler [(Entity Usuario,Entity Publicacao)]
-    liftIO $ print $ show xs    
-    --publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta]
-    sendResponse (object["usuario" .= pack "a"])
-
+    --publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta] -- Implementar por data de postagem (DESC)
+    sendResponse (object["usuario" .= usuarioPostagem xs] )
+    where usuarioPostagem = fmap (\ (u , p) -> toJSON u) 
     
 -- == buscar
 optionsBuscarR ::Text -> Handler ()

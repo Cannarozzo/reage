@@ -52,4 +52,7 @@
     
 /publicacoes
 == gera uma lista de todas as publicações(feed) e seus respectivos postadores(usuários)
+    --chamada
         curl https://web-babibonna.c9users.io/publicacoes
+    **resposta
+        

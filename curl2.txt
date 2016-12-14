@@ -1,0 +1,11 @@
+curl -X POST  https://web-babibonna.c9users.io/usuario/inserir -d '{"apelido":"gordinha","senha":"333","nome":"Lilian","anoNasci":1930,"email":"lilian@hotmail.com","estado":"RJ","pais":"Brasil","avatar":1,"cor":1}'
+
+curl -X POST  https://web-babibonna.c9users.io/usuario/publicar -d '{"usuarioId":2,"conteudo":"hoje estou desanimada","dataCompleta":"1000-01-01 00:00:00","categoria":1}'
+
+
+{"usuario":[
+    [{"email":"vanessa@hotmail.com","apelido":"fofinha","estado":"SP","nome":"Vanessa","id":1,"pais":"Brasil","cor":1,"anoNasci":1830,"senha":"123","avatar":1},{"conteudo":"hoje estou triste","dataCompleta":"00-00-00","usuarioId":1,"categoria":5,"id":2}],
+    [{"email":"lilian@hotmail.com","apelido":"gordinha","estado":"RJ","nome":"Lilian","id":2,"pais":"Brasil","cor":1,"anoNasci":1930,"senha":"333","avatar":1},{"conteudo":"hoje estou desanimada","dataCompleta":"00-00-00","usuarioId":2,"categoria":1,"id":3}]
+           ]
+
+}
