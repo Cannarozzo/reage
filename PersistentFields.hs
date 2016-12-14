@@ -9,14 +9,15 @@ import Data.Aeson
 import GHC.Generics
 import Data.Text
 
+
 data CategoriaTipo = Ansiedade | Desanimo | Fobia |
                     Perda | Vicio | Tristeza deriving (Show,Read,Eq,Generic)
 derivePersistField "CategoriaTipo"
 
 
 instance FromJSON CategoriaTipo where
-    
-
+   parseJSON (Object o) = undefined
+        
 instance ToJSON CategoriaTipo where
     toJSON Ansiedade    =  object [ "Categoria" .= (pack.show) Ansiedade]
     toJSON Desanimo     =  object [ "Categoria" .= (pack.show) Desanimo ]
@@ -24,6 +25,7 @@ instance ToJSON CategoriaTipo where
     toJSON Perda        =  object [ "Categoria" .= (pack.show) Perda    ]
     toJSON Vicio        =  object [ "Categoria" .= (pack.show) Vicio    ]
     toJSON Tristeza     =  object [ "Categoria" .= (pack.show) Tristeza ]
+
 
 
 {-

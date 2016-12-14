@@ -1,20 +1,51 @@
-/usuario/login
-==Autentica Usuário
-existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"123","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
-não existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"12","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
-
 /usuario/inserir
 ==Inserir um Usuario
-curl -X POST  https://web-babibonna.c9users.io/usuario/inserir -d '{"apelido":"fofinha","senha":"123","nome":"Vanessa","anoNasci":1830,"email":"vanessa@hotmail.com","estado":"SP","pais":"Brasil","avatar":1,"cor":1}'     
+    --chamada
+        curl -X POST  https://web-babibonna.c9users.io/usuario/inserir -d '{"apelido":"fofinha","senha":"123","nome":"Vanessa","anoNasci":1830,"email":"vanessa@hotmail.com","estado":"SP","pais":"Brasil","avatar":1,"cor":1}' 
+    **resposta
+        {"resp":{"CREATED":"1"}}
+
+/usuario/login
+==Autentica Usuário
+    --chamada:
+        curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"123","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
+    **resposta
+        {"resp":{"usuario":"-1"}
+        
+    --chamada erro
+        curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"12","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
+    **resposta
+        {"resp":{"usuario":"-1"}}
+
 
 /usuario/obter
 == Obtem um usuário com base no seu ID 
-curl https://web-babibonna.c9users.io/usuario/obter/1
-
+    --chamada
+        curl https://web-babibonna.c9users.io/usuario/obter/1
+    **resposta
+        {"email":"vanessa@hotmail.com","apelido":"fofinha","estado":"SP","nome":"Vanessa","pais":"Brasil","cor":1,"anoNasci":1830,"senha":"123","avatar":1}
+        
+    --erro
+         curl https://web-babibonna.c9users.io/usuario/obter/2
+    **resposta
+        404 Not Found
+    
 /usuario/remover
 == Remove um usuário com base no seu ID
-curl -X DELETE  https://web-babibonna.c9users.io/usuario/remover/1
-
+    --chamada
+        curl -X DELETE  https://web-babibonna.c9users.io/usuario/remover/1
+    **resposta
+        {"resp":"Deleted"}
+        
+    --erro
+        curl -X DELETE  https://web-babibonna.c9users.io/usuario/remover/2
+    **resposta
+        404 Not Found
+        
 /usuario/publicar
 == Insere uma publicação feita pelo usuário
-curl -X POST  https://web-babibonna.c9users.io/usuario/publicar -d '{"usuarioId":1,"conteudo":"hoje estou triste","dataCompleta:"222","categoria":"Perda"}'
+    --chamada
+        curl -X POST  https://web-babibonna.c9users.io/usuario/publicar -d '{"usuarioId":1,"conteudo":"hoje estou triste","dataCompleta":"1000-01-01 00:00:00","categoria":5}'
+    **resposta 
+        {"resp":"Postagem Criada"}
+    OBS* Não ESQUEÇA DE EXECUTAR O SCRIPT carga.sql para inserir as categorias na tabela categoria. Sem isso o curl não funcionará por não existir um id da tabela categoria

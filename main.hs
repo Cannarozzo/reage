@@ -9,8 +9,6 @@ import Data.Time.Clock
 
 
 import PersistentFields
-
-
              
 data Reage = Reage{connPool :: ConnectionPool}
 
@@ -31,10 +29,10 @@ Usuario json
 Publicacao json
     usuarioId       UsuarioId
     conteudo        Text
-    dataCompleta    UTCTime 
-    categoria       CategoriaTipo
+    dataCompleta    Text 
+    categoria       CategoriaId
 Categoria json
-    categoria   CategoriaTipo
+    categoria   Text -- CategoriaTipo, implementar o fromJson
     descricao   Text
 |]
 
@@ -160,8 +158,8 @@ postUsuarioPublicarR = do
     addHeader "Access-Control-Allow-Origin" "*"
     agora <- liftIO $ getCurrentTime
     p <- requireJsonBody :: Handler Publicacao
-    runDB $ insert ( Publicacao (publicacaoUsuarioId p) (publicacaoConteudo p) (agora) (publicacaoCategoria p) )
-    sendResponse (object [pack "resp" .= pack "CREATED"])
+    runDB $ insert ( Publicacao (publicacaoUsuarioId p) (publicacaoConteudo p) (pack "00-00-00") (publicacaoCategoria p) ) -- Implementar UTCTime
+    sendResponse (object [pack "resp" .= pack "Postagem Criada"])
     
     
 -- == publicacoes   PublicacoesR   
