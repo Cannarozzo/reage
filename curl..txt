@@ -1,6 +1,9 @@
-Inserir um Usuario
-curl -X POST  https://web-babibonna.c9users.io/usuario -d '{"apelido":"fofinha","senha":"123","nome":"Vanessa","anoNasci":1830,"email":"vanessa@hotmail.com","estado":"SP","pais":"Brasil","avatar":1,"cor":1}'     
+==Autentica Usuário
+existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"123","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
+não existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"12","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
 
-Mostra um usuario cadastrado pelo seu id!
+==Inserir um Usuario
+curl -X POST  https://web-babibonna.c9users.io/usuario/inserir -d '{"apelido":"fofinha","senha":"123","nome":"Vanessa","anoNasci":1830,"email":"vanessa@hotmail.com","estado":"SP","pais":"Brasil","avatar":1,"cor":1}'     
 
-curl https://web-babibonna.c9users.io/usuario/pegar/1
+== Obtem um usuário com base no seu ID 
+curl https://web-babibonna.c9users.io/usuario/obter/1
