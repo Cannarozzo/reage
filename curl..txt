@@ -1,9 +1,20 @@
+/usuario/login
 ==Autentica Usuário
 existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"123","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
 não existente: curl -X POST https://web-babibonna.c9users.io/usuario/login -d '{"apelido":"","senha":"12","nome":"","anoNasci":0,"email":"vanessa@hotmail.com","estado":"","pais":"","avatar":0,"cor":0}'
 
+/usuario/inserir
 ==Inserir um Usuario
 curl -X POST  https://web-babibonna.c9users.io/usuario/inserir -d '{"apelido":"fofinha","senha":"123","nome":"Vanessa","anoNasci":1830,"email":"vanessa@hotmail.com","estado":"SP","pais":"Brasil","avatar":1,"cor":1}'     
 
+/usuario/obter
 == Obtem um usuário com base no seu ID 
 curl https://web-babibonna.c9users.io/usuario/obter/1
+
+/usuario/remover
+== Remove um usuário com base no seu ID
+curl -X DELETE  https://web-babibonna.c9users.io/usuario/remover/1
+
+/usuario/publicar
+== Insere uma publicação feita pelo usuário
+curl -X POST  https://web-babibonna.c9users.io/usuario/publicar -d '{"usuarioId":1,"conteudo":"hoje estou triste","dataCompleta:"222","categoria":"Perda"}'

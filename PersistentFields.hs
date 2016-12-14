@@ -13,5 +13,6 @@ data CategoriaTipo = Ansiedade | Desanimo | Fobia |
 derivePersistField "CategoriaTipo"
 
 
-instance FromJSON CategoriaTipo
+instance FromJSON CategoriaTipo -- fazer em casa
+
 instance ToJSON CategoriaTipo

@@ -29,10 +29,9 @@ Usuario json
     cor         Int
     UniqueUsuario email
 Publicacao json
-    usuarioId       UsuarioId
     conteudo        Text
     dataCompleta    UTCTime 
-    categoria       CategoriaTipo
+    categoria       Bool
 Categoria json
     categoria   CategoriaTipo
     descricao   Text
@@ -40,16 +39,16 @@ Categoria json
 
 mkYesod "Reage" [parseRoutes|
 / HomeR GET
-/usuario/login                   UsuarioLoginR      POST OPTIONS
-/usuario/obter/#UsuarioId        UsuarioGetR        GET OPTIONS
-/usuario/inserir                 UsuarioInserirR    POST OPTIONS -- CADASTRO DO USUARIO, ALTERAÇÃO E DELETE,
-/usuario/editar/#UsuarioId       UsuarioConfR       PUT -- ALTERAÇÃO E DELETE
-/usuario/remover/#UsuarioId      UsuarioRemoverR    DELETE OPTIONS
-/usuario/publicar                UsuarioPublicarR   POST OPTIONS  -- FAZER A PUBLICAÇÃO 
+/usuario/login                   UsuarioLoginR   POST OPTIONS
+/usuario/obter/#UsuarioId        UsuarioGetR     GET
+/usuario/inserir UsuarioInserirR POST       OPTIONS -- CADASTRO DO USUARIO, ALTERAÇÃO E DELETE,
+/usuario/editar/#UsuarioId UsuarioConfR     PUT -- ALTERAÇÃO E DELETE
+/usuario/remover/#UsuarioId UsuarioRemoverR DELETE
 
-/publicacoes                     PublicacoesR       GET OPTIONS -- MOSTRAR PUBLICAÇÃO NO FEED POR DATA
-    -- perfil PerfilR GET -- MOSTRAR PERFIL DO USUARIO E PUBLICAÇÕES FEITAS POR ELE
-/buscar/#Text                    BuscarR             GET OPTIONS
+/publicar PublicarR  OPTIONS POST -- FAZER A PUBLICAÇÃO 
+/feed FeedR GET -- MOSTRAR PUBLICAÇÃO NO FEED POR DATA
+-- perfil PerfilR GET -- MOSTRAR PERFIL DO USUARIO E PUBLICAÇÕES FEITAS POR ELE
+/buscar/#Text BuscaR GET
 
 
 
@@ -92,19 +91,13 @@ postUsuarioLoginR = do
             where 
                 uidText = (pack.show.fromSqlKey) uid 
               
--- == usuario/obter UsuarioGetR
-optionsUsuarioGetR :: UsuarioId -> Handler ()
-optionsUsuarioGetR uid = do 
-    addHeader "Access-Control-Allow-Origin" "*"
-    addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
-    addHeader "Access-Control-Allow-Methods" "POST"
-
+-- == usuario/obter UsuarioGetR 
 getUsuarioGetR :: UsuarioId -> Handler ()
 getUsuarioGetR uid = do
-    addHeader "Access-Control-Allow-Origin" "*" 
     usuario <- runDB $ get404 uid
-    sendResponse $ toJSON usuario 
-    
+    sendResponse $ toJSON usuario
+  
+  
 -- == usuario/inserir UsuarioInserirR     
 optionsUsuarioInserirR :: Handler ()
 optionsUsuarioInserirR = do 
@@ -134,52 +127,37 @@ putUsuarioConfR cid = do
     sendResponse (object [pack "resp" .= pack "Changed"])
     
 
--- == usuario/remover
-optionsUsuarioRemoverR :: UsuarioId -> Handler ()
-optionsUsuarioRemoverR uid = do 
-    addHeader "Access-Control-Allow-Origin" "*"
-    addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
-    addHeader "Access-Control-Allow-Methods" "DELETE"
-
+-- == usuario/
 deleteUsuarioRemoverR :: UsuarioId -> Handler ()
 deleteUsuarioRemoverR cid = do
     addHeader "Access-Control-Allow-Origin" "*"
     runDB $ delete cid
     sendResponse (object [pack "resp".= pack "Deleted"])
 
--- == usuario/postar UsuarioPostarR
-optionsUsuarioPublicarR :: Handler ()
-optionsUsuarioPublicarR = do 
+optionsPublicarR :: Handler ()
+optionsPublicarR = do 
     addHeader "Access-Control-Allow-Origin" "*"
     addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
     addHeader "Access-Control-Allow-Methods" "POST"
     
-postUsuarioPublicarR :: Handler ()
-postUsuarioPublicarR = do
+postPublicarR :: Handler ()
+postPublicarR = do
     addHeader "Access-Control-Allow-Origin" "*"
     publicacao <- requireJsonBody :: Handler Publicacao
     runDB $ insert publicacao
     sendResponse (object [pack "resp" .= pack "CREATED"])
 
     
--- == publicacoes   PublicacoesR   
-
-optionsPublicacoesR :: Handler ()
-optionsPublicacoesR = undefined
-
-getPublicacoesR :: Handler ()
-getPublicacoesR = do
+getFeedR :: Handler ()
+getFeedR = do
     addHeader "Access-Control-Allow-Origin" "*"
     publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta]
     sendResponse (object["usuario" .= fmap toJSON publicacao])
 
     
--- == buscar
-optionsBuscarR ::Text -> Handler ()
-optionsBuscarR texto = undefined
     
-getBuscarR :: Text -> Handler TypedContent
-getBuscarR str = undefined
+getBuscaR :: Text -> Handler TypedContent
+getBuscaR str = undefined
 --    var <- runDB $ selectList [CategoriaTipo ==.str] [Asc PublicacaoDataReg]
 --      sendResponse (object["usuario" .= fmap toJSON publicacao])
 
@@ -190,7 +168,7 @@ connectionInfo = defaultConnectInfo { connectHost = "localhost",
                                       connectPort = 3306,
                                       connectUser = "babibonna",
                                       connectPassword = "",
-                                      connectDatabase = "reagedb"}
+                                      connectDatabase = "reagedb1"}
 -- connStr = "dbname=dd9en8l5q4hh2a host=ec2-107-21-219-201.compute-1.amazonaws.com user=kpuwtbqndoeyqb password=aCROh525uugAWF1l7kahlNN3E0 port=5432"
 -- https://hackage.haskell.org/package/persistent-mysql-2.1/docs/Database-Persist-MySQL.html#t:ConnectInfo
 main::IO()
