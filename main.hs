@@ -49,8 +49,8 @@ mkYesod "Reage" [parseRoutes|
 /usuario/publicar                UsuarioPublicarR   POST OPTIONS  -- FAZER A PUBLICAÇÃO 
 
 /publicacoes                     PublicacoesR       GET OPTIONS -- MOSTRAR PUBLICAÇÃO NO FEED POR DATA
-    -- perfil PerfilR GET -- MOSTRAR PERFIL DO USUARIO E PUBLICAÇÕES FEITAS POR ELE
-/buscar/#Text                    BuscarR             GET OPTIONS
+-- /perfil                          PerfilR            GET OPTIONS -- MOSTRAR PERFIL DO USUARIO E PUBLICAÇÕES FEITAS POR ELE
+/buscar/#Text                    BuscarR            GET OPTIONS
 
 
 
@@ -128,11 +128,8 @@ putUsuarioConfR cid = do
     addHeader "Access-Control-Allow-Origin" "*"
     usuario <- requireJsonBody :: Handler Usuario
     runDB $ update cid [UsuarioApelido =. (usuarioApelido usuario),
-                        UsuarioAnoNasci =. (usuarioAnoNasci usuario),
-                        UsuarioEstado =. (usuarioEstado usuario),
-                        UsuarioAvatar =. (usuarioAvatar usuario),
-                        UsuarioCor =. (usuarioCor usuario)]
-    sendResponse (object [pack "resp" .= pack "Changed"])
+                        UsuarioEstado =. (usuarioEstado usuario)]
+    sendResponse (object [pack "resp" .= pack "UPDATED"])
     
 
 -- == usuario/remover
@@ -171,25 +168,42 @@ optionsPublicacoesR = do
     addHeader "Access-Control-Allow-Origin" "*"
     addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
     addHeader "Access-Control-Allow-Methods" "GET"
-getPublicacoesR :: Handler ()
+    
+getPublicacoesR :: Handler Value
 getPublicacoesR = do
     addHeader "Access-Control-Allow-Origin" "*"
-    xs <- runDB $ (rawSql (pack $ "SELECT ??, ?? FROM usuario  \ 
+    ps <- runDB $ selectList [] []
+    us <- sequence $ fmap (runDB . get404 . publicacaoUsuarioId . entityVal) ps
+    ct <- sequence $ fmap (runDB . get404 . publicacaoCategoria . entityVal) ps
+    {-xs <- runDB $ (rawSql (pack $ "SELECT ??, ?? FROM usuario  \ 
         \ INNER JOIN publicacao \
-        \ ON  usuario.id=publicacao.usuario_id ") []) :: Handler [(Entity Usuario,Entity Publicacao)]
-    --publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta] -- Implementar por data de postagem (DESC)
-    sendResponse (object["usuario" .= usuarioPostagem xs] )
-    where usuarioPostagem = fmap (\ (u , p) -> toJSON u) 
+        \ ON  usuario.id = publicacao.usuario_id ") []) :: Handler [(Entity Usuario,Entity Publicacao)]
+    publicacao <- runDB $ selectList [] [Asc PublicacaoDataCompleta] -- Implementar por data de postagem (DESC)-}
+    returnJson (object ["resp" .= usuarioPostagem (zip3 us ps ct)])
+    where
+        usuarioPostagem = fmap (\(u, p, c) -> object ["usuario" .= (toJSON u), "publicacao" .= (toJSON p), "categoria" .= (categoriaNome c)])
+        zip3 :: [a] -> [b] -> [c] -> [(a, b, c)]
+        zip3 (a:as) (b:bs) (c:cs) = [(a, b, c)] ++ zip3 as bs cs
+        zip3 [] _ _ = []
+            
     
 -- == buscar
-optionsBuscarR ::Text -> Handler ()
-optionsBuscarR texto = undefined
+optionsBuscarR :: Text -> Handler ()
+optionsBuscarR = undefined{-do
+    addHeader "Access-Control-Allow-Origin" "*" 
+    addHeader "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type, Accept"
+    addHeader "Access-Control-Allow-Methods" "GET"-}
     
-getBuscarR :: Text -> Handler TypedContent
-getBuscarR str = undefined
---    var <- runDB $ selectList [CategoriaTipo ==.str] [Asc PublicacaoDataReg]
---      sendResponse (object["usuario" .= fmap toJSON publicacao])
-
+getBuscarR :: Text -> Handler ()
+getBuscarR str = do
+    addHeader "Access-Control-Allow-Origin" "*"
+    Just cat <- runDB $ selectFirst [CategoriaNome ==. str] []
+    ps <- runDB $ selectList [PublicacaoCategoria ==. (entityKey cat)] []
+    us <- sequence $ fmap (runDB . get404 . publicacaoUsuarioId . entityVal) ps
+    sendResponse (object ["resp" .= categoriaPostagem (Prelude.zip us ps)])
+    where
+        categoriaPostagem = fmap (\(u, p) -> object ["usuario" .= (toJSON u), "publicacao" .= (toJSON p)])
+    
 -----------------------------------------------------
 --connStr = "user=babibonna password= host=localhost port=3306 dbname=reagedb "
 

@@ -55,4 +55,15 @@
     --chamada
         curl https://web-babibonna.c9users.io/publicacoes
     **resposta
-        
+
+/usuario/editar
+== Edita o apelido e a UF do usuário
+    --chamada
+        curl -X PUT https://web-babibonna.c9users.io/usuario/editar/1 -d '{"email":"vanessa@hotmail.com","apelido":"Fofinha","estado":"RS","nome":"Vanessa","pais":"Brasil","cor":1,"anoNasci":1830,"senha":"123","avatar":1}'
+    **resposta
+    
+/buscar/#Text
+== Lista publicações de acordo com a categoria fornecida
+    --chamada
+        curl https://web-babibonna.c9users.io/buscar/Tristeza
+    **resposta
